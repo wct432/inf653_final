@@ -1,0 +1,19 @@
+const express = require('express');
+const router = express.Router();
+const { getStateData, getFunFacts, postFunFacts, patchFunFact, deleteFunFact } = require('../controllers/statesController');
+
+router.get('/', getStateData);
+router.get('/:state', getStateData);
+router.get('/:state/funfact', getFunFacts);
+router.get('/:state/capital', getStateData);
+router.get('/:state/nickname', getStateData);
+router.get('/:state/population', getStateData);
+router.get('/:state/admission', getStateData);
+
+router.post('/:state/funfact', postFunFacts);
+
+router.patch('/:state/funfact', patchFunFact);
+
+router.delete('/:state/funfact', deleteFunFact);
+
+module.exports = router;
