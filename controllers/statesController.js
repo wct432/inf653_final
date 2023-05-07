@@ -7,48 +7,50 @@ const State = require('../models/States');
 connectDB();
 
 
-// Helper function to find a state by its code
-const findStateByCode = async (code) => {
-    return State.findOne({ stateCode: new RegExp(`^${code}$`, 'i') });
+const findStateByCode = (code) => {
+    return statesData.find(state => state.code.toLowerCase() === code.toLowerCase());
   };
+  
   
   
 
 // Add functions to handle each route here
 exports.getStateData = async (req, res) => {
-  const contig = req.query.contig;
-  const stateParam = req.params.state;
-
-  if (stateParam) {
-    const stateData = findStateByCode(stateParam);
-    if (!stateData) {
-      return res.status(404).json({ error: 'State not found' });
-    }
-
-    switch (req.path) {
-      case `/capital`:
-        return res.json({ state: stateData.state, capital: stateData.capital_city });
-      case `/nickname`:
-        return res.json({ state: stateData.state, nickname: stateData.nickname });
-      case `/population`:
-        return res.json({ state: stateData.state, population: stateData.population });
-      case `/admission`:
-        return res.json({ state: stateData.state, admitted: stateData.admission_date });
-      default:
-        return res.json(stateData);
-    }
-  }
-
-  if (contig !== undefined) {
-    const contigStates = statesData.filter((state) => {
-      return contig.toLowerCase() === 'true' ? state.code !== 'AK' && state.code !== 'HI' : state.code === 'AK' || state.code === 'HI';
-    });
-    return res.json(contigStates);
-  }
+    const contig = req.query.contig;
+    const stateParam = req.params.state;
   
-
-  res.json(statesData);
-};
+    if (stateParam) {
+      const stateData = findStateByCode(stateParam);
+      if (!stateData) {
+        return res.status(404).json({ error: 'State not found' });
+      }
+  
+      switch (req.baseUrl + req.path) {
+          case `/states/${stateParam}/capital`:
+            return res.json({ state: stateData.state, capital: stateData.capital_city });
+          case `/states/${stateParam}/nickname`:
+            return res.json({ state: stateData.state, nickname: stateData.nickname });
+          case `/states/${stateParam}/population`:
+            return res.json({ state: stateData.state, population: stateData.population });
+          case `/states/${stateParam}/admission`:
+            return res.json({ state: stateData.state, admitted: stateData.admission_date });
+          default:
+            return res.json(stateData);
+        }
+        
+    }
+  
+    if (contig !== undefined) {
+      const contigStates = statesData.filter((state) => {
+        return contig.toLowerCase() === 'true' ? state.code !== 'AK' && state.code !== 'HI' : state.code === 'AK' || state.code === 'HI';
+      });
+      return res.json(contigStates);
+    }
+    
+  
+    res.json(statesData);
+  };
+  
 
 exports.getFunFacts = async (req, res) => {
     const stateCode = req.params.state;
